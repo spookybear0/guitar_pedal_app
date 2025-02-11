@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Home"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bluetooth),
+            icon: Icon(Client.isConnected ? Icons.wifi : Icons.wifi_off),
             onPressed: () {
               Navigator.push(
                 context,

@@ -18,12 +18,12 @@ class Client {
   static List<Preset> presets = [];
 
   /// Connects to the ESP32's Wi-Fi Access Point
-  static Future<void> connectToWiFi() async {
+  static Future<bool> connectToWiFi() async {
     // check if already connected
     if (await WiFiForIoTPlugin.isConnected() && await WiFiForIoTPlugin.getSSID() == ssid) {
       debugPrint("Already connected to Wi-Fi: $ssid");
       isConnected = true;
-      return;
+      return true;
     }
     
     bool success = await WiFiForIoTPlugin.connect(
@@ -35,11 +35,20 @@ class Client {
     );
     
     if (success) {
+      WiFiForIoTPlugin.forceWifiUsage(true);
+
       debugPrint("Connected to Wi-Fi: $ssid");
       isConnected = true;
+      return true;
     } else {
       debugPrint("Failed to connect to Wi-Fi.");
+      return false;
     }
+  }
+
+  static void disconnect() async {
+    await WiFiForIoTPlugin.disconnect();
+    isConnected = false;
   }
 
   // send get request to ESP32
@@ -72,8 +81,16 @@ class Client {
       } else {
         debugPrint("POST Request Failed: ${response.statusCode}");
       }
-    } catch (e) {
-      debugPrint("POST Request Error: $e");
+    }
+    catch (e) {
+      if (e is http.ClientException && e.message.contains("Connection failed")) {
+        debugPrint("POST Request Error: Connection refused. Is the ESP32 running?");
+        Client.isConnected = false;
+      }
+      
+      else {
+        debugPrint("POST Request Error: $e");
+      }
     }
     return null;
   }

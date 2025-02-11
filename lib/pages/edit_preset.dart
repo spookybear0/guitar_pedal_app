@@ -116,6 +116,34 @@ class _EditPresetPageState extends State<EditPresetPage> {
                             });
                           }
                         ),
+                        const Text(
+                          "Volume",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Slider(
+                          value: effect.volume.toDouble(),
+                          min: 0,
+                          max: 255,
+                          onChanged: (value) {
+                            setState(() {
+                              effect.volume = value.toInt();
+                            });
+                          }
+                        ),
+                        const Text(
+                          "Mix",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Slider(
+                          value: effect.mix.toDouble(),
+                          min: 0,
+                          max: 255,
+                          onChanged: (value) {
+                            setState(() {
+                              effect.mix = value.toInt();
+                            });
+                          }
+                        ),
                         // Delete effect button
                         TextButton(
                           onPressed: () {

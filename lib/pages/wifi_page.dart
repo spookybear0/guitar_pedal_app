@@ -8,16 +8,28 @@ class WifiPage extends StatefulWidget {
 }
 
 class _WifiPageState extends State<WifiPage> {
-  String? connectedDevice;
-
   @override
   void initState() {
     super.initState();
-    Client.connectToWiFi();
+    Timer(const Duration(seconds: 2), () {
+      if (Client.isConnected) {
+        setState(() {});
+      }
+    });
+
+    connectDevice();
+  }
+
+  void connectDevice() async {
+    bool connected = await Client.connectToWiFi();
+    if (connected) {
+      setState(() {});
+    }
   }
 
   void disconnectDevice() {
-    
+    Client.disconnect();
+    Navigator.pop(context);
   }
 
   @override
@@ -30,19 +42,18 @@ class _WifiPageState extends State<WifiPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Bluetooth Connection"),
+        title: const Text("WiFi Connection"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             children: [
-              connectedDevice != null
+              Client.isConnected
                   ? Column(
                       children: [
                         const SizedBox(height: 16),
-                        Text("Connected to: $connectedDevice",
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const Text("Connected", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: disconnectDevice,
@@ -53,8 +64,7 @@ class _WifiPageState extends State<WifiPage> {
                   : const Column(
                       children: [
                         SizedBox(height: 16),
-                        Text("Scanning for Vortex Pedal...",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text("Connecting...", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         SizedBox(height: 16),
                         CircularProgressIndicator(),
                       ],
